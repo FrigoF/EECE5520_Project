@@ -5,7 +5,7 @@
 % Oct 17, 2017
 % Oct 27, 2017 - use Hamming window for apodization
 % Oct 15, 2020 - Resize Final Image if necessary
-% Feb 22, 2025 - Extract corner points for Gradwarp
+% Feb 22, 2025 - Extract corner points & other parameters from Pfile
 
 % Enter name of Pfile
 pfile = "";
