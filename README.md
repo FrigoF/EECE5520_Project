@@ -12,6 +12,8 @@ Magnetic Resonance Image Reconstruction Project
 - filterChannelData.m - Applies Fermi Filter & any required chopping (fftshift) to raw data 
 - getChannelData.m - Reads raw data and necessary parameters from Pfile
 - laplacian_image.m - Resize image for non-symmetric acquisition sizes & apply Laplacian filter to sharpen image.
+- plotp.m - Plot one frame of data from a Pfile
+- raw_image.m - Displays the magnitude of raw data (K-space)
 - read_weights.m - Reads coil weights from Pfile used in sum of squares coil combination.
 - resize_image.m - Resize image for non-symmetric acquisition sizes if necessary.
 - sumOfSquares.m - Multi-channel image combination using method described by Roemer
