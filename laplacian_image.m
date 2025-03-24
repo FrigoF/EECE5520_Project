@@ -7,7 +7,7 @@
 %
 % @param raw_frams array containing the raw data to be displayed
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function final_image = resize_image(input_image, da_xres, da_yres, zip_factor)
+function final_image = laplacian_image(input_image, da_xres, da_yres, zip_factor)
     
     num_rows = size(input_image,2);
     num_cols = size(input_image,1);
