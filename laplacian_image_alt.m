@@ -1,10 +1,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Title: laplacian_image.m  - Apply Laplacian Filter for edge sharpening
+% Title: laplacian_image_alt.m  - Apply Laplacian Filter for edge sharpening
 % Author: Fred J. Frigo
 % Description: Resample image if acquisition size differs from fftsize
 %              zip_factor =1, means no interpolation
 %              zip_factor =2, means factor of 2 interpolation, etc.
 %
+% Similar to laplacian_image.m - but this scales output image to max of 60000 vs 20000
 % @param raw_frams array containing the raw data to be displayed
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function final_image = laplacian_image_alt(input_image, da_xres, da_yres, zip_factor)
