@@ -1,4 +1,4 @@
-% ReconZIP4.m - MR image reconstruction from Pfile
+% ReconMain_laplacian.m - MR image reconstruction from Pfile
 % Marquette University
 %
 % Fred J. Frigo
