@@ -5,6 +5,7 @@
 % Oct 17, 2017
 % Oct 15, 2020 - Resize image / modified for zero padding interpolation
 % Feb 22, 2025 - Extract corner points & other parameters from Pfile
+% Mar 01, 2026 - Add Gradwarp correction
 
 % Enter name of Pfile
 pfile = "";
@@ -83,4 +84,5 @@ info.SeriesNumber = 1;
 result = dicomwrite(final_image,new_dfile,info,'CreateMode','copy');
 
 msg=sprintf('New dicom file created = %s', new_dfile);
+
 disp(msg);
