@@ -17,10 +17,10 @@
 % @return da_xres - data acquisition size is row dimension
 % @return da_yres - data acquisition size in col dimension
 % @return gradcoil - gradient type:  BRM, XRMB, XRMW
-% @return corner_points - image corner points for gradwarp
+% @return four_corners - 4 image corner points for gradwarp
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [raw_frames, chop, da_xres, da_yres, gradcoil, corner_points] = getChannelData(pfile, slice_no)
+function [raw_frames, chop, da_xres, da_yres, gradcoil, four_corners] = getChannelData(pfile, slice_no)
     my_slice = slice_no;
 
     % Open Pfile to read reference scan data.
@@ -134,7 +134,23 @@ function [raw_frames, chop, da_xres, da_yres, gradcoil, corner_points] = getChan
     status = fseek(fid, file_offset, 'bof');
     data_elements = 9;
     [corner_points, count] = fread(fid, data_elements, 'float');
-    corner_points 
+    P1=[corner_points(2); corner_points(1); corner_points(3)];
+    P2=[corner_points(5); corner_points(4); corner_points(6)];
+    P3=[corner_points(8); corner_points(7); corner_points(9)];
+
+    % Compute the missing corner point from the other 3
+    d12= norm(P1-P2)^2;
+    d23= norm(P2-P3)^2;
+    d31= norm(P3-P1)^2;
+    if d12 > d23 && d12 >d31
+        A=P3; B= P1; C=P2;
+    elseif d23 >d12 && d23 > d31
+        A=P1; B=P2; C=P3;
+    else
+        A=P2; B=P2; C=P1;
+    end
+    D= B + C - A;
+    four_corners = [A,B,C,D]';
     
     % Compute size (in bytes) of each frame, echo and slice
     data_elements = da_xres*2*(da_yres-1);

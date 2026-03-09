@@ -6,6 +6,7 @@
 % Oct 27, 2017 - use Hamming window for apodization
 % Oct 15, 2020 - Resize Final Image if necessary
 % Feb 22, 2025 - Extract corner points & other parameters from Pfile
+% Mar 01, 2026 - Add Gradwarp correction
 
 % Enter name of Pfile
 pfile = "";
@@ -23,8 +24,8 @@ num_chan = size(raw_data,3);
 %2: Perform Fermi apodization and chopping
 xdim = size(raw_data, 1);
 ffilter = fermi(xdim, 0.45*xdim, 0.1*xdim);  % try fermi( xdim, 0.1*xdim, 0.01*xdim)
-figure;
-mesh(ffilter);  % this plots the apodization filter
+% figure;
+% mesh(ffilter);  % this plots the apodization filter
 filt_data = filterChannelData(raw_data, ffilter, chop, num_chan);
 
 % display the k-space magnitude 
@@ -37,7 +38,7 @@ im_data = transformChannelData(filt_data);
 displayMagnitude(im_data, 'Image magnitude', 0);
 
 %5: Display the image phase for each channel
-displayPhase(im_data, 'Image Phase');
+% displayPhase(im_data, 'Image Phase');
 
 %6: calculate magnitude image
 if (num_chan > 1)
@@ -50,12 +51,22 @@ sos_image = sumOfSquares(im_data, weights);
 
 %7: Resize image if necessary
 zip_factor =1;
-final_image = resize_image( sos_image, da_xres, da_yres, zip_factor);
+mag_image = resize_image( sos_image, da_xres, da_yres, zip_factor);
 
-%8: Create DICOM image file from Pfile name
+%8: Gradwarp Correct
+gw_coeffs = read_ge_coeff(gw_coil);
+gw_image = gradwarp_2D(mag_image, gw_coeffs, corner_points);
+
+% Scale image to max pixel of 20000
+image_max = max(max(gw_image));
+scale_factor = 20000/image_max;
+final_image = uint16(gw_image.*scale_factor);
+figure();
+imshow(final_image);
+title("Gradwarp Corrected image");
+
+%9 Create the new DICOM image 
 new_dfile = strcat(pfile, ".dcm");
-
-%9 Create the new DICOM image  
 result = dicomwrite(final_image, new_dfile);
 info = dicominfo(new_dfile);
 
@@ -63,7 +74,7 @@ info = dicominfo(new_dfile);
 info.WindowWidth  = max(max(final_image));  %default window width for new image
 info.WindowCenter = info.WindowWidth/2;  %defautl window level for new image
 info.PatientName.FamilyName = fname;
-info.SeriesDescription = 'No Gradwarp';
+info.SeriesDescription = 'Gradwarp Corrected';
 info.ExamNumber = '1';
 info.SeriesNumber = 1;
 result = dicomwrite(final_image,new_dfile,info,'CreateMode','copy');

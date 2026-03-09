@@ -7,7 +7,7 @@
 %
 % @param raw_frams array containing the raw data to be displayed
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function final_image = resize_image(input_image, da_xres, da_yres, zip_factor)
+function output_image = resize_image(input_image, da_xres, da_yres, zip_factor)
     
     num_rows = size(input_image,2);
     num_cols = size(input_image,1);
@@ -26,15 +26,5 @@ function final_image = resize_image(input_image, da_xres, da_yres, zip_factor)
             end
         end
     end    
-
-    % scale to max pixel value of 20000
-    image_max = max(max(output_image));
-    scale_factor = 20000/image_max;
-    final_image = uint16(output_image.*scale_factor);
-
-    % Display image
-    figure 
-    imagesc(final_image);
-    colormap('gray');
-    title('Final Image');
+    
 end

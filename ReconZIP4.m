@@ -23,7 +23,7 @@ num_chan = size(raw_data,3);
 %2: Perform Fermi apodization and chopping
 xdim = size(raw_data, 1);
 ffilter = fermi(xdim, 0.45*xdim, 0.1*xdim);
-mesh(ffilter);  % this plots the apodization filter
+% mesh(ffilter);  % this plots the apodization filter
 filt_data = filterChannelData(raw_data, ffilter, chop, num_chan);
 
 %2.5: Zero Pad by zip_factor 
@@ -54,12 +54,22 @@ end
 sos_image = sumOfSquares(im_data, weights);
 
 %7: Resize image if necessary
-final_image = resize_image( sos_image, da_xres, da_yres, zip_factor);
+mag_image = resize_image( sos_image, da_xres, da_yres, zip_factor);
 
-%8: Create DICOM image file from Pfile name
+%8: Gradwarp Correct 
+gw_coeffs = read_ge_coeff(gw_coil);
+gw_image = gradwarp_2D(mag_image, gw_coeffs, corner_points);
+
+% Scale image to max pixel of 20000
+image_max = max(max(gw_image));
+scale_factor = 20000/image_max;
+final_image = uint16(gw_image.*scale_factor);
+figure();
+imshow(final_image);
+title("Gradwarp Corrected image");
+
+%9 Create the new DICOM image 
 new_dfile = strcat(pfile, "zip4.dcm");
-
-%9 Create the new DICOM image  
 result = dicomwrite(final_image, new_dfile);
 info = dicominfo(new_dfile);
 
@@ -67,11 +77,10 @@ info = dicominfo(new_dfile);
 info.WindowWidth  = max(max(final_image));  %default window width for new image
 info.WindowCenter = info.WindowWidth/2;  %defautl window level for new image
 info.PatientName.FamilyName = fname;
-info.SeriesDescription = 'ZIP4';
+info.SeriesDescription = 'Gradwarp Corrected, ZIP4';
 info.ExamNumber = '1';
-info.SeriesNumber = 2;
+info.SeriesNumber = 1;
 result = dicomwrite(final_image,new_dfile,info,'CreateMode','copy');
 
 msg=sprintf('New dicom file created = %s', new_dfile);
 disp(msg);
-
